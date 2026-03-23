@@ -1,0 +1,11 @@
+{
+  "name": "pm-copilet",
+  "version": "0.0.0",
+  "description": "A terminal-based AI assistant for software teams that brings the feel of Claude Code to project management.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
