@@ -9,7 +9,8 @@ import {
   parseCommand,
   executeCommand,
 } from "./commands/index.js";
-import { loadSystemPrompt } from "./system-prompt.js";
+import { loadSystemPrompt, loadProjectContext } from "./system-prompt.js";
+import { getProjectPath } from "./projects/index.js";
 
 interface TokenUsage {
   input: number;
@@ -17,13 +18,16 @@ interface TokenUsage {
 }
 
 interface AppProps {
+  projectName: string;
   systemPromptPath?: string;
 }
 
 const client = new Anthropic();
 
 /** Main application component rendering a chat TUI. */
-export default function App({ systemPromptPath }: AppProps): React.ReactElement {
+export default function App({ projectName, systemPromptPath }: AppProps): React.ReactElement {
+  const projectPath = getProjectPath(projectName);
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [apiMessages, setApiMessages] = useState<Anthropic.MessageParam[]>([]);
   const [input, setInput] = useState("");
@@ -32,14 +36,34 @@ export default function App({ systemPromptPath }: AppProps): React.ReactElement 
   const [systemPrompt, setSystemPrompt] = useState<string | undefined>();
 
   useEffect(() => {
-    if (!systemPromptPath) return;
-    loadSystemPrompt(systemPromptPath).then(setSystemPrompt).catch((err) => {
-      const msg = err instanceof Error ? err.message : "Unknown error";
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", text: `Failed to load system prompt: ${msg}` },
-      ]);
-    });
+    async function init() {
+      let prompt = "";
+
+      if (systemPromptPath) {
+        try {
+          prompt = await loadSystemPrompt(systemPromptPath);
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : "Unknown error";
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", text: `Failed to load system prompt: ${msg}` },
+          ]);
+        }
+      }
+
+      const projectContext = await loadProjectContext(process.cwd());
+      if (projectContext) {
+        prompt = prompt
+          ? `${prompt}\n\n# Project Context\n\n${projectContext}`
+          : projectContext;
+      }
+
+      if (prompt) {
+        setSystemPrompt(prompt);
+      }
+    }
+
+    init();
   }, [systemPromptPath]);
 
   const handleSubmit = useCallback(
@@ -192,7 +216,7 @@ export default function App({ systemPromptPath }: AppProps): React.ReactElement 
   return (
     <Box flexDirection="column">
       <Text bold color="cyan">
-        PM Copilot
+        PM Copilot — {projectName}
       </Text>
       <Text dimColor>────────────────────────────────</Text>
 

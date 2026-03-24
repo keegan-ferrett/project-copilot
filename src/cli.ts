@@ -10,6 +10,7 @@ const DEFAULT_SYSTEM_PROMPT = join(__dirname, "..", "prompts", "system.md");
 
 /** Result returned when the CLI falls through to the TUI. */
 export interface CliOptions {
+  projectName: string;
   systemPromptPath?: string;
 }
 
@@ -18,7 +19,7 @@ export interface CliOptions {
  * Returns true if a subcommand was handled, or CliOptions to fall through to the TUI.
  */
 export async function runCli(args: string[]): Promise<true | CliOptions> {
-  const options: CliOptions = {};
+  const flags: { systemPromptPath?: string } = {};
   const positional: string[] = [];
 
   for (let i = 0; i < args.length; i++) {
@@ -28,7 +29,7 @@ export async function runCli(args: string[]): Promise<true | CliOptions> {
         console.error("Usage: pm-copilot --system-prompt <file>");
         process.exit(1);
       }
-      options.systemPromptPath = resolve(value);
+      flags.systemPromptPath = resolve(value);
     } else {
       positional.push(args[i]);
     }
@@ -59,9 +60,14 @@ export async function runCli(args: string[]): Promise<true | CliOptions> {
     return true;
   }
 
-  if (!options.systemPromptPath) {
-    options.systemPromptPath = DEFAULT_SYSTEM_PROMPT;
+  const projectName = positional[0];
+  if (!projectName) {
+    console.error("Usage: pm-copilot <project-name> [--system-prompt <file>]");
+    process.exit(1);
   }
 
-  return options;
+  return {
+    projectName,
+    systemPromptPath: flags.systemPromptPath ?? DEFAULT_SYSTEM_PROMPT,
+  };
 }
