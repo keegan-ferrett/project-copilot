@@ -3,6 +3,7 @@ import { Box, Text } from "ink";
 
 export interface Message {
   role: "user" | "assistant";
+  type?: "tool";
   text: string;
 }
 
@@ -17,10 +18,16 @@ export default function MessageList({ messages, loading }: MessageListProps): Re
     <Box flexDirection="column">
       {messages.map((msg, i) => (
         <Box key={i} marginTop={i > 0 ? 1 : 0}>
-          <Text color={msg.role === "user" ? "green" : "white"}>
-            <Text bold>{msg.role === "user" ? "you" : "assistant"}&gt; </Text>
-            {msg.text}
-          </Text>
+          {msg.type === "tool" ? (
+            <Text dimColor italic>
+              {msg.text}
+            </Text>
+          ) : (
+            <Text color={msg.role === "user" ? "green" : "white"}>
+              <Text bold>{msg.role === "user" ? "you" : "assistant"}&gt; </Text>
+              {msg.text}
+            </Text>
+          )}
         </Box>
       ))}
 
