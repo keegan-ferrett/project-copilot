@@ -15,7 +15,7 @@ PM Copilot — a terminal-based AI assistant for software teams. It wraps the An
 
 ## Architecture
 
-The app is a React/Ink TUI. Entry point is `src/index.tsx` which renders the `App` component.
+The app is a React/Ink TUI. Entry point is `src/index.tsx` which parses CLI arguments first via `cli.ts`, then renders the `App` component if no subcommand was handled.
 
 **App.tsx** owns all state and API interaction:
 - Maintains two parallel message arrays: one for UI display (`Message[]`) and one for the Anthropic API (`MessageParam[]`)
@@ -26,6 +26,14 @@ The app is a React/Ink TUI. Entry point is `src/index.tsx` which renders the `Ap
 **Components:**
 - `components/MessageList.tsx` — renders conversation history and loading indicator. Exports the `Message` interface used across the app. Messages with `type: "tool"` or `type: "command"` render dimmed and italic.
 - `components/ChatInput.tsx` — bordered text input with a custom bottom border that displays token count. Uses `useStdout` to match terminal width.
+
+**CLI (`src/cli.ts`):**
+- Parses `process.argv` and dispatches subcommands (e.g. `new`). Returns `true` if a command was handled, `false` to fall through to the TUI.
+
+**Projects (`src/projects/`):**
+- A project is a named directory stored at `~/.pm-copilot/<name>/`. The `~/.pm-copilot/` root is created on first use.
+- `index.ts` — exports `getProjectsRoot()`, `getProjectPath()`, and `createProject()`. `createProject()` fails if the directory already exists.
+- Create a project: `pm-copilot new "<project-name>"`
 
 **Tools (`src/tools/`):**
 - `types.ts` — shared `ToolHandler` interface (definition + execute function)
@@ -48,4 +56,5 @@ The app is a React/Ink TUI. Entry point is `src/index.tsx` which renders the `Ap
 - JSX configured with `react-jsx` transform (no `React` import needed for JSX, but used for type annotations)
 - Model is set to `claude-sonnet-4-6` in App.tsx
 - API key loaded from `.env` via `dotenv/config` import at the top of `index.tsx`
+- `package.json` has a `bin` field mapping `pm-copilot` to `dist/index.js` for global CLI installation
 - Commit messages follow Conventional Commits style
