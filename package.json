@@ -4,6 +4,9 @@
   "description": "A terminal-based AI assistant for software teams that brings the feel of Claude Code to project management.",
   "type": "module",
   "main": "dist/index.js",
+  "bin": {
+    "pm-copilot": "dist/index.js"
+  },
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
