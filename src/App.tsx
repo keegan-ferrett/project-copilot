@@ -4,6 +4,11 @@ import Anthropic from "@anthropic-ai/sdk";
 import MessageList, { type Message } from "./components/MessageList.js";
 import ChatInput from "./components/ChatInput.js";
 import { toolDefinitions, executeTool } from "./tools/index.js";
+import {
+  isCommand,
+  parseCommand,
+  executeCommand,
+} from "./commands/index.js";
 
 interface TokenUsage {
   input: number;
@@ -22,10 +27,38 @@ export default function App(): React.ReactElement {
 
   const handleSubmit = useCallback(
     async (value: string) => {
-      const trimmed = value.trim();
+      let trimmed = value.trim();
       if (!trimmed || loading) return;
 
       setInput("");
+
+      // Slash command handling
+      if (isCommand(trimmed)) {
+        const { name, args } = parseCommand(trimmed);
+        setMessages((prev) => [...prev, { role: "user", text: trimmed }]);
+
+        const result = await executeCommand(name, args, {
+          messages,
+          setMessages,
+          apiMessages,
+          setApiMessages,
+        });
+
+        if (result.type === "action") {
+          if (result.message) {
+            const text = result.message;
+            setMessages((prev) => [
+              ...prev,
+              { role: "assistant" as const, type: "command" as const, text },
+            ]);
+          }
+          return;
+        }
+
+        // Prompt commands — send the generated prompt to the API
+        trimmed = result.prompt;
+      }
+
       setMessages((prev) => [...prev, { role: "user", text: trimmed }]);
 
       const nextApiMessages: Anthropic.MessageParam[] = [

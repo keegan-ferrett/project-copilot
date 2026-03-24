@@ -24,7 +24,7 @@ The app is a React/Ink TUI. Entry point is `src/index.tsx` which renders the `Ap
 - Tracks token usage per turn
 
 **Components:**
-- `components/MessageList.tsx` — renders conversation history and loading indicator. Exports the `Message` interface used across the app. Messages with `type: "tool"` render dimmed and italic.
+- `components/MessageList.tsx` — renders conversation history and loading indicator. Exports the `Message` interface used across the app. Messages with `type: "tool"` or `type: "command"` render dimmed and italic.
 - `components/ChatInput.tsx` — bordered text input with a custom bottom border that displays token count. Uses `useStdout` to match terminal width.
 
 **Tools (`src/tools/`):**
@@ -32,6 +32,15 @@ The app is a React/Ink TUI. Entry point is `src/index.tsx` which renders the `Ap
 - `index.ts` — map-based tool registry. Exports `registerTool()`, `toolDefinitions()`, and `executeTool()`. Built-in tools are registered at module load.
 - `read.ts` — Read tool: reads a file from disk and returns its contents
 - To add a new tool: create a file exporting a `ToolHandler`, then call `registerTool()` in `index.ts`
+
+**Slash Commands (`src/commands/`):**
+- `types.ts` — `CommandHandler` interface, `CommandContext` (app state/setters), and `CommandResult` discriminated union (`"prompt"` sends text to the AI, `"action"` performs a side-effect)
+- `index.ts` — map-based command registry. Exports `registerCommand()`, `commandList()`, `isCommand()`, `parseCommand()`, and `executeCommand()`. Built-in commands are registered at module load.
+- `help.ts` — `/help`: lists all available slash commands
+- `clear.ts` — `/clear`: resets chat history and API context
+- `echo.ts` — `/echo <text>`: echoes arguments back into the chat
+- To add a new command: create a file exporting a `CommandHandler`, then call `registerCommand()` in `index.ts`
+- App.tsx intercepts `/`-prefixed input in `handleSubmit` before the API call
 
 ## Key Details
 
