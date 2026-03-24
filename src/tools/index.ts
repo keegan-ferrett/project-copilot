@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { ToolHandler } from "./types.js";
 import { readToolHandler } from "./read.js";
+import { writeToolHandler } from "./write.js";
 
 export type { ToolHandler } from "./types.js";
 
@@ -28,3 +29,4 @@ export async function executeTool(
 
 // Register built-in tools
 registerTool(readToolHandler);
+registerTool(writeToolHandler);

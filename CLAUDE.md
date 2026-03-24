@@ -35,11 +35,7 @@ The app is a React/Ink TUI. Entry point is `src/index.tsx` which parses CLI argu
 - `index.ts` — exports `getProjectsRoot()`, `getProjectPath()`, and `createProject()`. `createProject()` fails if the directory already exists.
 - Create a project: `pm-copilot new "<project-name>"`
 
-**Tools (`src/tools/`):**
-- `types.ts` — shared `ToolHandler` interface (definition + execute function)
-- `index.ts` — map-based tool registry. Exports `registerTool()`, `toolDefinitions()`, and `executeTool()`. Built-in tools are registered at module load.
-- `read.ts` — Read tool: reads a file from disk and returns its contents
-- To add a new tool: create a file exporting a `ToolHandler`, then call `registerTool()` in `index.ts`
+**Tools (`src/tools/`):** See [docs/tools.md](docs/tools.md) for full tool documentation.
 
 **Slash Commands (`src/commands/`):**
 - `types.ts` — `CommandHandler` interface, `CommandContext` (app state/setters), and `CommandResult` discriminated union (`"prompt"` sends text to the AI, `"action"` performs a side-effect)
