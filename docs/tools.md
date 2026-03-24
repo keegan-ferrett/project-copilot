@@ -23,6 +23,13 @@ Writes content to a file at the specified path, creating the file if it does not
 - **Source:** `src/tools/write.ts`
 - **Parameters:** `file_path` (string, required), `content` (string, required)
 
+### Tree
+
+Prints the directory structure as a tree, respecting `.gitignore`. Uses `git ls-files` to include only tracked and untracked-but-not-ignored files.
+
+- **Source:** `src/tools/tree.ts`
+- **Parameters:** `path` (string, optional — subdirectory to scope the tree to)
+
 ## Adding a New Tool
 
 1. Create a file in `src/tools/` exporting a `ToolHandler`
