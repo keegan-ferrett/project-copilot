@@ -40,7 +40,7 @@ export default function App(): React.ReactElement {
         let response = await client.messages.create({
           model: "claude-sonnet-4-6",
           max_tokens: 4096,
-          tools: toolDefinitions,
+          tools: toolDefinitions(),
           messages: currentMessages,
         });
 
@@ -99,7 +99,7 @@ export default function App(): React.ReactElement {
           response = await client.messages.create({
             model: "claude-sonnet-4-6",
             max_tokens: 4096,
-            tools: toolDefinitions,
+            tools: toolDefinitions(),
             messages: currentMessages,
           });
         }
