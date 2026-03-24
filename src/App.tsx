@@ -1,34 +1,8 @@
 import React, { useState, useCallback } from "react";
-import { Box, Text, useStdout } from "ink";
-import TextInput from "ink-text-input";
+import { Box, Text } from "ink";
 import Anthropic from "@anthropic-ai/sdk";
-
-// Round border characters from cli-boxes
-const BOTTOM_LEFT = "╰";
-const BOTTOM_RIGHT = "╯";
-const HORIZONTAL = "─";
-
-/** Renders the bottom border of the input box with an optional token label. */
-function InputBottomBorder({ totalTokens }: { totalTokens: number | null }): React.ReactElement {
-  const { stdout } = useStdout();
-  const width = stdout.columns;
-  const label = totalTokens !== null ? ` tokens: ${totalTokens} ` : "";
-  const lineLength = Math.max(0, width - 2 - label.length);
-
-  return (
-    <Text>
-      {BOTTOM_LEFT}
-      {HORIZONTAL.repeat(lineLength)}
-      {label && <Text dimColor>{label}</Text>}
-      {BOTTOM_RIGHT}
-    </Text>
-  );
-}
-
-interface Message {
-  role: "user" | "assistant";
-  text: string;
-}
+import MessageList, { type Message } from "./components/MessageList.js";
+import ChatInput from "./components/ChatInput.js";
 
 interface TokenUsage {
   input: number;
@@ -107,31 +81,13 @@ export default function App(): React.ReactElement {
       </Text>
       <Text dimColor>────────────────────────────────</Text>
 
-      {messages.map((msg, i) => (
-        <Box key={i} marginTop={i > 0 ? 1 : 0}>
-          <Text color={msg.role === "user" ? "green" : "white"}>
-            <Text bold>{msg.role === "user" ? "you" : "assistant"}&gt; </Text>
-            {msg.text}
-          </Text>
-        </Box>
-      ))}
-
-      {loading && (
-        <Text dimColor italic>
-          thinking...
-        </Text>
-      )}
-
-      <Box marginTop={1} borderStyle="round" borderBottom={false} paddingX={1}>
-        <Text bold>&gt; </Text>
-        <TextInput
-          value={input}
-          onChange={setInput}
-          onSubmit={handleSubmit}
-          placeholder="Type a message..."
-        />
-      </Box>
-      <InputBottomBorder totalTokens={tokens ? tokens.input + tokens.output : null} />
+      <MessageList messages={messages} loading={loading} />
+      <ChatInput
+        value={input}
+        onChange={setInput}
+        onSubmit={handleSubmit}
+        totalTokens={tokens ? tokens.input + tokens.output : null}
+      />
     </Box>
   );
 }
