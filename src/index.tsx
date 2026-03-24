@@ -4,8 +4,8 @@ import { render } from "ink";
 import App from "./App.js";
 import { runCli } from "./cli.js";
 
-const handled = await runCli(process.argv.slice(2));
+const result = await runCli(process.argv.slice(2));
 
-if (!handled) {
-  render(React.createElement(App));
+if (result !== true) {
+  render(React.createElement(App, { systemPromptPath: result.systemPromptPath }));
 }

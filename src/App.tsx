@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { Box, Text } from "ink";
 import Anthropic from "@anthropic-ai/sdk";
 import MessageList, { type Message } from "./components/MessageList.js";
@@ -9,21 +9,38 @@ import {
   parseCommand,
   executeCommand,
 } from "./commands/index.js";
+import { loadSystemPrompt } from "./system-prompt.js";
 
 interface TokenUsage {
   input: number;
   output: number;
 }
 
+interface AppProps {
+  systemPromptPath?: string;
+}
+
 const client = new Anthropic();
 
 /** Main application component rendering a chat TUI. */
-export default function App(): React.ReactElement {
+export default function App({ systemPromptPath }: AppProps): React.ReactElement {
   const [messages, setMessages] = useState<Message[]>([]);
   const [apiMessages, setApiMessages] = useState<Anthropic.MessageParam[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [tokens, setTokens] = useState<TokenUsage | null>(null);
+  const [systemPrompt, setSystemPrompt] = useState<string | undefined>();
+
+  useEffect(() => {
+    if (!systemPromptPath) return;
+    loadSystemPrompt(systemPromptPath).then(setSystemPrompt).catch((err) => {
+      const msg = err instanceof Error ? err.message : "Unknown error";
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", text: `Failed to load system prompt: ${msg}` },
+      ]);
+    });
+  }, [systemPromptPath]);
 
   const handleSubmit = useCallback(
     async (value: string) => {
@@ -73,6 +90,7 @@ export default function App(): React.ReactElement {
         let response = await client.messages.create({
           model: "claude-sonnet-4-6",
           max_tokens: 4096,
+          ...(systemPrompt ? { system: systemPrompt } : {}),
           tools: toolDefinitions(),
           messages: currentMessages,
         });
@@ -132,6 +150,7 @@ export default function App(): React.ReactElement {
           response = await client.messages.create({
             model: "claude-sonnet-4-6",
             max_tokens: 4096,
+            ...(systemPrompt ? { system: systemPrompt } : {}),
             tools: toolDefinitions(),
             messages: currentMessages,
           });
@@ -167,7 +186,7 @@ export default function App(): React.ReactElement {
         setLoading(false);
       }
     },
-    [apiMessages, loading],
+    [apiMessages, loading, systemPrompt],
   );
 
   return (
