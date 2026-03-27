@@ -250,6 +250,7 @@ export default function App({ systemPromptPath }: AppProps): React.ReactElement 
           onSubmit={handleSubmit}
           totalTokens={tokens ? tokens.input + tokens.output : null}
           commands={commands}
+          modelLabel={modelLabel(model)}
         />
       )}
     </Box>
