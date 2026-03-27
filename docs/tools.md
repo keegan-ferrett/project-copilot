@@ -30,6 +30,13 @@ Prints the directory structure as a tree, respecting `.gitignore` rules. Walks t
 - **Source:** `src/tools/tree.ts`
 - **Parameters:** `path` (string, optional — subdirectory to scope the tree to)
 
+### Edit
+
+Performs a find-and-replace on a file. If there are multiple matches and the global flag is not set, returns an error prompting the agent to either expand the search string or enable global replacement.
+
+- **Source:** `src/tools/edit.ts`
+- **Parameters:** `file_path` (string, required), `search_string` (string, required), `replacement_string` (string, required), `global` (boolean, optional — defaults to false)
+
 ## Adding a New Tool
 
 1. Create a file in `src/tools/` exporting a `ToolHandler`
