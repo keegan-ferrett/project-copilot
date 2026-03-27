@@ -15,7 +15,7 @@ PM Copilot — a terminal-based AI assistant for software teams. It wraps the An
 
 ## Architecture
 
-The app is a React/Ink TUI. Entry point is `src/index.tsx` which parses CLI arguments first via `cli.ts`, then renders the `App` component if no subcommand was handled.
+The app is a React/Ink TUI. Entry point is `src/index.tsx` which parses CLI arguments via `cli.ts`, then renders the `App` component.
 
 **App.tsx** owns all state and API interaction:
 - Maintains two parallel message arrays: one for UI display (`Message[]`) and one for the Anthropic API (`MessageParam[]`)
@@ -28,12 +28,8 @@ The app is a React/Ink TUI. Entry point is `src/index.tsx` which parses CLI argu
 - `components/ChatInput.tsx` — bordered text input with a custom bottom border that displays token count. Uses `useStdout` to match terminal width.
 
 **CLI (`src/cli.ts`):**
-- Parses `process.argv` and dispatches subcommands (e.g. `new`). Returns `true` if a command was handled, `false` to fall through to the TUI.
-
-**Projects (`src/projects/`):**
-- A project is a named directory stored at `~/.pm-copilot/<name>/`. The `~/.pm-copilot/` root is created on first use.
-- `index.ts` — exports `getProjectsRoot()`, `getProjectPath()`, and `createProject()`. `createProject()` fails if the directory already exists.
-- Create a project: `pm-copilot new "<project-name>"`
+- Parses `process.argv` for flags (e.g. `--system-prompt`) and returns `CliOptions` for the TUI. No subcommands — the tool runs from any directory.
+- If a `PROJECT.md` exists in the current working directory, its contents are loaded as additional context for the AI.
 
 **Tools (`src/tools/`):** See [docs/tools.md](docs/tools.md) for full tool documentation.
 
