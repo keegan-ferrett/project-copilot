@@ -25,7 +25,7 @@ Writes content to a file at the specified path, creating the file if it does not
 
 ### Tree
 
-Prints the directory structure as a tree, respecting `.gitignore`. Uses `git ls-files` to include only tracked and untracked-but-not-ignored files.
+Prints the directory structure as a tree, respecting `.gitignore` rules. Walks the filesystem directly and filters entries using `.gitignore` files found at each directory level. Does not depend on `git`.
 
 - **Source:** `src/tools/tree.ts`
 - **Parameters:** `path` (string, optional — subdirectory to scope the tree to)
