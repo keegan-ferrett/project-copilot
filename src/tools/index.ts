@@ -3,6 +3,7 @@ import type { ToolHandler } from "./types.js";
 import { readToolHandler } from "./read.js";
 import { writeToolHandler } from "./write.js";
 import { treeToolHandler } from "./tree.js";
+import { editToolHandler } from "./edit.js";
 
 export type { ToolHandler } from "./types.js";
 
@@ -32,3 +33,4 @@ export async function executeTool(
 registerTool(readToolHandler);
 registerTool(writeToolHandler);
 registerTool(treeToolHandler);
+registerTool(editToolHandler);
