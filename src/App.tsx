@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useMemo } from "react";
 import { Box, Text } from "ink";
 import Anthropic from "@anthropic-ai/sdk";
 import MessageList, { type Message } from "./components/MessageList.js";
@@ -8,6 +8,7 @@ import {
   isCommand,
   parseCommand,
   executeCommand,
+  commandList,
 } from "./commands/index.js";
 import { loadSystemPrompt, loadProjectContext } from "./system-prompt.js";
 
@@ -224,6 +225,7 @@ export default function App({ systemPromptPath }: AppProps): React.ReactElement 
         onChange={setInput}
         onSubmit={handleSubmit}
         totalTokens={tokens ? tokens.input + tokens.output : null}
+        commands={useMemo(() => commandList(), [])}
       />
     </Box>
   );
