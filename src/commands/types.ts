@@ -8,6 +8,7 @@ export interface CommandContext {
   apiMessages: Anthropic.MessageParam[];
   setApiMessages: React.Dispatch<React.SetStateAction<Anthropic.MessageParam[]>>;
   systemPrompt?: string;
+  setShowModelSelector?: (show: boolean) => void;
 }
 
 /**

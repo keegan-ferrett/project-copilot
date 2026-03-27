@@ -10,20 +10,23 @@ const HORIZONTAL = "─";
 
 interface InputBottomBorderProps {
   totalTokens: number | null;
+  modelLabel: string;
 }
 
-/** Renders the bottom border of the input box with an optional token label. */
-function InputBottomBorder({ totalTokens }: InputBottomBorderProps): React.ReactElement {
+/** Renders the bottom border of the input box with token count and model label. */
+function InputBottomBorder({ totalTokens, modelLabel }: InputBottomBorderProps): React.ReactElement {
   const { stdout } = useStdout();
   const width = stdout.columns;
-  const label = totalTokens !== null ? ` tokens: ${totalTokens} ` : "";
-  const lineLength = Math.max(0, width - 2 - label.length);
+  const tokenSegment = totalTokens !== null ? ` tokens: ${totalTokens} ` : "";
+  const modelSegment = ` model: ${modelLabel} `;
+  const lineLength = Math.max(0, width - 2 - tokenSegment.length - modelSegment.length);
 
   return (
     <Text>
       {BOTTOM_LEFT}
+      {tokenSegment && <Text dimColor>{tokenSegment}</Text>}
       {HORIZONTAL.repeat(lineLength)}
-      {label && <Text dimColor>{label}</Text>}
+      <Text dimColor>{modelSegment}</Text>
       {BOTTOM_RIGHT}
     </Text>
   );
@@ -35,10 +38,11 @@ interface ChatInputProps {
   onSubmit: (value: string) => void;
   totalTokens: number | null;
   commands: CommandHandler[];
+  modelLabel: string;
 }
 
 /** Text input with a bordered frame, command hints, and token count on the bottom border. */
-export default function ChatInput({ value, onChange, onSubmit, totalTokens, commands }: ChatInputProps): React.ReactElement {
+export default function ChatInput({ value, onChange, onSubmit, totalTokens, commands, modelLabel }: ChatInputProps): React.ReactElement {
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [inputKey, setInputKey] = useState(0);
 
@@ -112,7 +116,7 @@ export default function ChatInput({ value, onChange, onSubmit, totalTokens, comm
           placeholder="Type a message..."
         />
       </Box>
-      <InputBottomBorder totalTokens={totalTokens} />
+      <InputBottomBorder totalTokens={totalTokens} modelLabel={modelLabel} />
       {showHints && <CommandHints matches={matches} selectedIndex={selectedIndex} />}
     </>
   );

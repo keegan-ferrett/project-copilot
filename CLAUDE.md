@@ -46,7 +46,7 @@ The app is a React/Ink TUI. Entry point is `src/index.tsx` which parses CLI argu
 
 - ESM project (`"type": "module"` in package.json) — local imports require `.js` extensions
 - JSX configured with `react-jsx` transform (no `React` import needed for JSX, but used for type annotations)
-- Model is set to `claude-sonnet-4-6` in App.tsx
+- Model defaults to `claude-sonnet-4-6` and can be changed at runtime via the `/model` slash command
 - API key loaded from `.env` via `dotenv/config` import at the top of `index.tsx`
 - `package.json` has a `bin` field mapping `pm-copilot` to `dist/index.js` for global CLI installation
 - Commit messages follow Conventional Commits style

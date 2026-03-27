@@ -3,6 +3,7 @@ import { Box, Text } from "ink";
 import Anthropic from "@anthropic-ai/sdk";
 import MessageList, { type Message } from "./components/MessageList.js";
 import ChatInput from "./components/ChatInput.js";
+import ModelSelector, { modelLabel, type ModelId } from "./components/ModelSelector.js";
 import { toolDefinitions, executeTool } from "./tools/index.js";
 import {
   isCommand,
@@ -32,6 +33,8 @@ export default function App({ systemPromptPath }: AppProps): React.ReactElement 
   const [loading, setLoading] = useState(false);
   const [tokens, setTokens] = useState<TokenUsage | null>(null);
   const [systemPrompt, setSystemPrompt] = useState<string | undefined>();
+  const [model, setModel] = useState<ModelId>("claude-sonnet-4-6");
+  const [showModelSelector, setShowModelSelector] = useState(false);
 
   useEffect(() => {
     async function init() {
@@ -82,6 +85,7 @@ export default function App({ systemPromptPath }: AppProps): React.ReactElement 
           apiMessages,
           setApiMessages,
           systemPrompt,
+          setShowModelSelector,
         });
 
         if (result.type === "action") {
@@ -111,7 +115,7 @@ export default function App({ systemPromptPath }: AppProps): React.ReactElement 
       try {
         let currentMessages = nextApiMessages;
         let response = await client.messages.create({
-          model: "claude-sonnet-4-6",
+          model,
           max_tokens: 4096,
           ...(systemPrompt ? { system: systemPrompt } : {}),
           tools: toolDefinitions(),
@@ -171,7 +175,7 @@ export default function App({ systemPromptPath }: AppProps): React.ReactElement 
           ];
 
           response = await client.messages.create({
-            model: "claude-sonnet-4-6",
+            model,
             max_tokens: 4096,
             ...(systemPrompt ? { system: systemPrompt } : {}),
             tools: toolDefinitions(),
@@ -209,8 +213,10 @@ export default function App({ systemPromptPath }: AppProps): React.ReactElement 
         setLoading(false);
       }
     },
-    [apiMessages, loading, systemPrompt],
+    [apiMessages, loading, model, systemPrompt],
   );
+
+  const commands = useMemo(() => commandList(), []);
 
   return (
     <Box flexDirection="column">
@@ -220,13 +226,33 @@ export default function App({ systemPromptPath }: AppProps): React.ReactElement 
       <Text dimColor>────────────────────────────────</Text>
 
       <MessageList messages={messages} loading={loading} />
-      <ChatInput
-        value={input}
-        onChange={setInput}
-        onSubmit={handleSubmit}
-        totalTokens={tokens ? tokens.input + tokens.output : null}
-        commands={useMemo(() => commandList(), [])}
-      />
+      {showModelSelector ? (
+        <ModelSelector
+          currentModel={model}
+          onSelect={(id) => {
+            setModel(id);
+            setShowModelSelector(false);
+            setMessages((prev) => [
+              ...prev,
+              {
+                role: "assistant" as const,
+                type: "command" as const,
+                text: `Model switched to ${modelLabel(id)}`,
+              },
+            ]);
+          }}
+          onCancel={() => setShowModelSelector(false)}
+        />
+      ) : (
+        <ChatInput
+          value={input}
+          onChange={setInput}
+          onSubmit={handleSubmit}
+          totalTokens={tokens ? tokens.input + tokens.output : null}
+          commands={commands}
+          modelLabel={modelLabel(model)}
+        />
+      )}
     </Box>
   );
 }
