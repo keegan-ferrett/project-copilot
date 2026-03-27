@@ -80,6 +80,7 @@ export default function App({ systemPromptPath }: AppProps): React.ReactElement 
           setMessages,
           apiMessages,
           setApiMessages,
+          systemPrompt,
         });
 
         if (result.type === "action") {
