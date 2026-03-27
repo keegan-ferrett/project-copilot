@@ -7,6 +7,7 @@ export interface CommandContext {
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
   apiMessages: Anthropic.MessageParam[];
   setApiMessages: React.Dispatch<React.SetStateAction<Anthropic.MessageParam[]>>;
+  systemPrompt?: string;
 }
 
 /**

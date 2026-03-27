@@ -2,6 +2,7 @@ import type { CommandHandler, CommandContext, CommandResult } from "./types.js";
 import { helpCommandHandler } from "./help.js";
 import { clearCommandHandler } from "./clear.js";
 import { echoCommandHandler } from "./echo.js";
+import { systemPromptCommandHandler } from "./system-prompt.js";
 
 export type { CommandHandler, CommandContext, CommandResult } from "./types.js";
 
@@ -48,3 +49,7 @@ export async function executeCommand(
 registerCommand(helpCommandHandler);
 registerCommand(clearCommandHandler);
 registerCommand(echoCommandHandler);
+
+if (process.env.DEV_MODE) {
+  registerCommand(systemPromptCommandHandler);
+}

@@ -83,6 +83,7 @@ export default function App({ projectName, systemPromptPath }: AppProps): React.
           setMessages,
           apiMessages,
           setApiMessages,
+          systemPrompt,
         });
 
         if (result.type === "action") {
