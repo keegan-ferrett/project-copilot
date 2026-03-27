@@ -10,7 +10,6 @@ import {
   executeCommand,
 } from "./commands/index.js";
 import { loadSystemPrompt, loadProjectContext } from "./system-prompt.js";
-import { getProjectPath } from "./projects/index.js";
 
 interface TokenUsage {
   input: number;
@@ -18,15 +17,13 @@ interface TokenUsage {
 }
 
 interface AppProps {
-  projectName: string;
   systemPromptPath?: string;
 }
 
 const client = new Anthropic();
 
 /** Main application component rendering a chat TUI. */
-export default function App({ projectName, systemPromptPath }: AppProps): React.ReactElement {
-  const projectPath = getProjectPath(projectName);
+export default function App({ systemPromptPath }: AppProps): React.ReactElement {
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [apiMessages, setApiMessages] = useState<Anthropic.MessageParam[]>([]);
@@ -216,7 +213,7 @@ export default function App({ projectName, systemPromptPath }: AppProps): React.
   return (
     <Box flexDirection="column">
       <Text bold color="cyan">
-        PM Copilot — {projectName}
+        PM Copilot
       </Text>
       <Text dimColor>────────────────────────────────</Text>
 
